@@ -1,0 +1,26 @@
+global:
+  replicas: 1
+  image: local-registry:3000/myapp:0.0.1
+  maxSurge: 100%
+  maxUnavailable: 90%
+  version: REPLACE
+  timeout: REPLACE
+  debug: false
+
+deployment:
+  enabled: true
+
+service:
+  port: 8080
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations: {}
+  host: myapp.local.k3d
+
+hpa:
+  enabled: false
+rollout:
+  enabled: false

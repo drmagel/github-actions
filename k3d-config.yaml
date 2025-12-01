@@ -1,0 +1,23 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: github-actions
+
+# Create registry named "local-registry"
+registries:
+  create:
+    name: local-registry
+    hostPort: "3000"
+
+# Expose the load balancer for ingress routing
+ports:
+  - port: 80:80
+    nodeFilters:
+      - loadbalancer
+  - port: 443:443
+    nodeFilters:
+      - loadbalancer
+
+# 1 server + 2 workers (change if needed)
+servers: 1
+agents: 2
