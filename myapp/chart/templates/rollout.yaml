@@ -1,0 +1,103 @@
+{{ if .Values.rollout.enabled }}
+{{ if .Values.deployment.enabled }}
+{{ with .Values.global }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ $.Release.Name }}
+spec:
+  {{- if not $.Values.hpa.enabled }}
+  replicas: {{ .replicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}
+  workloadRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $.Release.Name }}
+  strategy:
+    canary:
+      {{- if .maxSurge }}
+      maxSurge: {{ .maxSurge }}
+      {{- end }}
+      {{- if .maxUnavailable }}
+      maxUnavailable: {{ .maxUnavailable }}
+      {{- end }}
+      steps:
+        - setWeight: 100
+        - pause: {duration: 1}
+{{ end }}
+{{ else }}
+{{ with .Values.global }}
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  labels:
+    app: {{ $.Release.Name }}
+  name: {{ $.Release.Name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  minReadySeconds: 5
+  progressDeadlineSeconds: 300
+  {{- if not $.Values.hpa.enabled }}
+  replicas: {{ $.Values.replicas.count }}
+  {{- end }}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: {{ $.Release.Name }}
+  strategy:
+    canary:
+      {{- if .maxSurge }}
+      maxSurge: {{ .maxSurge }}
+      {{- end }}
+      {{- if .maxUnavailable }}
+      maxUnavailable: {{ .maxUnavailable }}
+      {{- end }}
+      steps:
+        - setWeight: 100
+        - pause: {duration: 1}
+  template:
+    metadata:
+      labels:
+        app: {{ $.Release.Name }}
+    spec:
+      containers:
+      - name: {{ $.Release.Name }}
+        image: {{ .image }}
+        imagePullPolicy: Always
+        env: 
+        - name: VERSION
+          value: {{ .version }}
+        - name: DEBUG
+          value: "{{ .debug }}"
+        - name: ALIVE_TIMEOUT
+          value: "{{ .timeout }}"
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 20
+          httpGet:
+            scheme: HTTP
+            path: /alive
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            scheme: HTTP
+            path: /alive
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+          periodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+{{ end }}
+{{ end }}
+{{ end }}

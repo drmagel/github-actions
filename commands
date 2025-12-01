@@ -1,0 +1,15 @@
+## https://k3d.io/stable/#install-specific-release
+k3d cluster create github-actions
+
+(cd k3d-demo && k3d cluster create github-actions --api-port 6550  --servers 3 --port 8080:80@loadbalancer --volume $(pwd)/sample:/src@all --wait)
+
+k3d cluster create --config k3d-config.yaml
+
+### GPG and Pass: 12GPGPass-=
+gpg --list-secret-keys --keyid-format LONG
+pass init 0F05FE567CFD0C93
+
+pass insert github-actions/token
+
+TOKEN=$(pass github-actions/token)
+

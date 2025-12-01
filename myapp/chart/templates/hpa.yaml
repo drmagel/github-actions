@@ -1,0 +1,28 @@
+{{ with .Values.hpa }}
+{{ if .enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $.Release.Name }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+  scaleTargetRef:
+  {{- if $.Values.deployment.enabled }}
+    apiVersion: apps/v1
+    kind: Deployment
+  {{- else }}
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+  {{- end }}
+    name: {{ $.Release.Name }}
+  minReplicas: {{ .minReplicas }}
+  maxReplicas: {{ .maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+{{ end }}
+{{ end }}
