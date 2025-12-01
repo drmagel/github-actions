@@ -5,6 +5,19 @@ k3d cluster create github-actions
 
 k3d cluster create --config k3d-config.yaml
 
+### GitHub repository token:
+git remote set-url origin git@dr.magel:drmagel/github-actions.git
+git remote -v
+
+### ~/.ssh/config:
+host dr.magel
+  HostName github.com
+  IdentityFile ~/.ssh/drgh_rsa
+  User git
+
+### New SSH key in GitHub:
+~/.ssh/drgh_rsa.pub
+
 ### GPG and Pass: 12GPGPass-=
 gpg --list-secret-keys --keyid-format LONG
 pass init 0F05FE567CFD0C93
