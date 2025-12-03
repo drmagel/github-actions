@@ -1,0 +1,27 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+
+{{ with .Values.runner }}
+{{ $repository := .repository }}
+{{ $minReplicas := .minReplicas }}
+{{ $maxReplicas := .maxReplicas }}
+{{ range .architecture }}
+{{ $arch := . }}
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: {{ $name }}-{{ $arch }}
+  namespace: {{ $namespace }}
+spec:
+  scaleTargetRef:
+    kind: RunnerDeployment
+    name: {{ $name }}-{{ $arch }}
+  minReplicas: {{ $minReplicas }}
+  maxReplicas: {{ $maxReplicas }}
+  metrics:
+    - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+      repositoryNames:
+        - {{ $repository }}
+{{ end }}
+{{ end }}
