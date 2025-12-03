@@ -1,0 +1,30 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+
+{{ with .Values.runner }}
+{{ $repository := .repository }}
+{{ $replicas := .replicas}}
+{{ range .architecture }}
+{{ $arch := . }}
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: {{ $name }}-{{ $arch }}
+  namespace: {{ $namespace }}
+spec:
+  template:
+    spec:
+      repository: {{ $repository }}
+      labels:
+        - {{ $arch }}
+      ephemeral: true
+      dockerdWithinRunnerContainer: false
+      # nodeSelector:
+      #   kubernetes.io/arch: {{ $arch }}
+      containers:
+        - name: runner
+          # image: summerwind/actions-runner:latest
+          image: local-registry:3000/github-actions-runner:built
+{{ end }}
+{{ end }}

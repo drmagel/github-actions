@@ -1,0 +1,7 @@
+runner:
+  repository: drmagel/github-actions
+  minReplicas: 1
+  maxReplicas: 5
+  architecture:
+    - arm64
+  #  - amd64

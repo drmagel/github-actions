@@ -1,0 +1,21 @@
+apiVersion: v2
+name: github-action-runner
+description: Helm umbrella chart that deploys GitHub Actions Runner
+type: application
+version: 0.1.0
+appVersion: 1.0.0
+
+maintainers:
+  - name: Dr Magel
+
+# dependencies:
+#   # actions-runner-controller dependency
+#   - name: actions-runner-controller
+#     version: "0.27.6"               # pick a valid release version
+#     repository: "https://actions-runner-controller.github.io/actions-runner-controller"
+
+#   # cert-manager dependency
+#   - name: cert-manager
+#     version: "v1.19.1"             # pick a compatible release
+#     repository: "https://charts.jetstack.io"
+
