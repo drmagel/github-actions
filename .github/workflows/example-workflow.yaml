@@ -1,0 +1,19 @@
+name: Example Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on:
+      - self-hosted
+      - tools
+      - arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: echo "Running on self-hosted runner with label 'tools'"
