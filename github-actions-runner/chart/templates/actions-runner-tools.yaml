@@ -1,4 +1,4 @@
-{{ $name := .Release.Name }}
+{{ $name := printf "%s-%s" .Release.Name "tools" }}
 {{ $namespace := .Release.Namespace }}
 
 {{ with .Values.runner }}
@@ -17,6 +17,7 @@ spec:
     spec:
       repository: {{ $repository }}
       labels:
+        - tools
         - {{ $arch }}
       ephemeral: true
       dockerdWithinRunnerContainer: false
