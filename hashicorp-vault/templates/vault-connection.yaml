@@ -1,0 +1,14 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+{{ $token := .Values.vault.server.dev.devRootToken }}
+
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultConnection
+metadata:
+  name: default
+  namespace: {{ $namespace }}
+spec:
+  address: http://{{ $name }}.{{ $namespace }}.svc:8200
+  skipTLSVerify: true
+  headers:
+    X-Vault-Token: {{ $token }}

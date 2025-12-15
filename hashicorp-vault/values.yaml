@@ -1,0 +1,22 @@
+
+
+vault:
+  server:
+    dev:
+      enabled: true
+      devRootToken: FROM_SET_COMMAND
+
+    ui:
+      enabled: true
+
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      hosts:
+        - host: vault.qqq.pm
+          paths:
+            - /
+
+rbac:
+  serviceAccout: vault-secrets-operator-controller-manager
+  role: vault-secrets-operator-manager

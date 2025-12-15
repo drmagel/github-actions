@@ -4,6 +4,7 @@
 {{ with .Values.runner }}
 {{ $repository := .repository }}
 {{ $replicas := .replicas}}
+{{ $image := printf "%s:%s" .image.registry .image.tag }}
 {{ range .architecture }}
 {{ $arch := . }}
 ---
@@ -27,7 +28,7 @@ spec:
       containers:
         - name: runner
           # image: summerwind/actions-runner-dind:latest
-          image: local-registry:3000/github-actions-runner:built
+          image: {{ $image }}
           env:
             - name: DOCKER_HOST
               value: tcp://localhost:2375

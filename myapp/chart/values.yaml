@@ -18,7 +18,7 @@ ingress:
   enabled: true
   className: traefik
   annotations: {}
-  host: myapp.local.k3d
+  host: myapp.qqq.pm
 
 hpa:
   enabled: false

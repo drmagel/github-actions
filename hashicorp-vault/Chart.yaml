@@ -1,0 +1,15 @@
+apiVersion: v2
+name: vault-stack
+description: "Installs HashiCorp Vault and Vault Secrets Operator in Kubernetes"
+type: application
+version: 0.1.0
+appVersion: "1.0"
+maintainers:
+  - name: Dr Magel
+dependencies:
+  - name: vault
+    version: "0.31.0"
+    repository: "https://helm.releases.hashicorp.com"
+  - name: vault-secrets-operator
+    version: "1.0.1"
+    repository: "https://helm.releases.hashicorp.com"

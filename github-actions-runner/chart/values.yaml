@@ -1,4 +1,7 @@
 runner:
+  image:
+    registry: local-registry:3000/github-actions-runner
+    tag: built
   repository: drmagel/github-actions
   minReplicas: 1
   maxReplicas: 5

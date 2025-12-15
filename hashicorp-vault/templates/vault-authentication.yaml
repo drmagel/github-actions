@@ -1,0 +1,51 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuthGlobal
+metadata:
+  name: default
+  namespace: {{ $namespace }}
+spec:
+  defaultAuthMethod: kubernetes
+  kubernetes:
+    audiences:
+    - vault
+    mount: kubernetes
+    role: vso
+    serviceAccount: default
+    # serviceAccount: {{ $name }}-vault-secrets-operator-controller-manager
+    tokenExpirationSeconds: 600
+  allowedNamespaces:
+    - "*"
+
+{{/*
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuthGlobal
+metadata:
+  name: vault-auth
+  namespace: {{ $namespace }}
+spec:
+  vaultConnectionRef: {{ $name }}-http
+  method: kubernetes
+  mount: kubernetes
+  kubernetes:
+    role: vso
+    serviceAccount: {{ $name }}-vault-secrets-operator-controller-manager
+  allowedNamespaces:
+    - "*"
+---
+apiVersion: secrets.hashicorp.com/v1beta1
+kind: VaultAuth
+metadata:
+  name: vault-auth
+  namespace: {{ $namespace }}
+spec:
+  kubernetes:
+    role: app1
+    serviceAccount: app1
+  vaultAuthGlobalRef:
+    allowDefault: true
+    namespace: {{ $namespace }}
+*/}}

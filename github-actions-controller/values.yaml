@@ -1,0 +1,13 @@
+# cert-manager:
+#   crds:
+#     enabled: true
+  # spec:
+  #   privateKey:
+  #     rotationPolicy: Never
+
+controller:
+  secret:
+    name: controller-manager
+    mount: k8s-secrets
+    path: github-actions-token
+    vaultAuthRef: 'vault/vault-auth'
