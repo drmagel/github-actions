@@ -17,8 +17,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run script
-        run: echo "Running on self-hosted runner 'arc-runner-arm64-dind'" && sleep 900
+      - name: Run script on docker container
+        run: |
+          echo "Running on self-hosted runner 'arc-runner-arm64-dind'"
+          docker run --rm \
+            -v ${{ github.workspace }}:/work \
+            ubuntu:24.04 \
+            ls -R /work
+          sleep 900
 
   run-on-tools:
     runs-on: arc-runner-arm64-tools
@@ -28,4 +34,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run script
-        run: echo "Running on self-hosted runner 'arc-runner-arm64-tools'" && sleep 900
+        run: |
+          echo "Running on self-hosted runner 'arc-runner-arm64-tools'"
+          (cd ${{ github.workspace }}; pwd)
+          ls -R ${{ github.workspace }}
+          sleep 900
