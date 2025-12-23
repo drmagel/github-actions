@@ -20,6 +20,8 @@ gha-runner-scale-set:
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
+          ports:
+            - containerPort: 2375
           readinessProbe:
             tcpSocket:
               port: 2375
