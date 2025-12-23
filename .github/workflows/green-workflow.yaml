@@ -1,0 +1,17 @@
+name: Green Workflow
+
+on:
+  push:
+    branches:
+      - dimar-green-work
+
+jobs:
+  build:
+    runs-on: arc-runner-arm64-dind
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: echo "Running on self-hosted runner 'arc-runner-arm64-dind'" && sleep 900
