@@ -111,31 +111,36 @@ arc-runner-chart:
 		--set gha-runner-scale-set.githubConfigSecret.github_token="$(GITHUB_TOKEN)" \
 		--namespace dev --create-namespace --wait
 
-arc-runner: ac-runner-pre arc-runner-chart
-
 application:
 	helm upgrade -i testapp myapp/chart \
 		--set global.version=green \
 		--set global.timeout=5 \
 		--namespace dev --create-namespace --wait
 
-install: k3d wait push vault wait vault-init cert-manager arc-controller application arc-runner
-
 build-runner:
+	docker rmi local-registry:3000/arc-runner:built
 	( cd github-arc-runner/image && docker build -t local-registry:3000/arc-runner:built . )
 
 build-applicaiton:
+	docker rmi local-registry:3000/myapp:0.0.1
 	( cd myapp/image && docker build -t local-registry:3000/myapp:0.0.1 . )
 
 push-runner:
 	docker push local-registry:3000/arc-runner:built
 
-push-applicaiton:
+push-application:
 	docker push local-registry:3000/myapp:0.0.1
 
 build: build-runner build-applicaiton
 
-push: push-runner push-applicaiton
+push: push-runner push-application
+
+arc-runner: ac-runner-pre arc-runner-chart
+
+install: k3d wait push vault wait vault-init cert-manager arc-controller application arc-runner
 
 run:
 	docker run --rm -it local-registry:3000/arc-runner:built bash
+
+prune:
+	docker builder prune -f

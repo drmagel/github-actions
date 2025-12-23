@@ -7,6 +7,9 @@ ARG PYTHON314_VERSION=3.14.1
 ARG KUBECTL_VERSION=1.35.0
 ARG HELM_VERSION=4.0.1
 ARG ARGO_CD_VERSION=3.0.6
+ARG TERRAFORM_VERSION=1.14.3
+ARG TERRAGRUNT_VERSION=0.96.0
+
 
 ENV HOME=/home/runner
 ENV LBIN="${HOME}/.local/bin"
@@ -19,6 +22,7 @@ RUN add-apt-repository ppa:rmescandon/yq -y
 RUN apt-get update
 RUN apt-get install -y \
     software-properties-common \
+    libarchive-tools \
     wget \
     jq \
     yq \
@@ -28,7 +32,7 @@ RUN apt-get install -y \
     python3-openssl \
     libssl-dev
 
-### kubernetes
+### Kubernetes
 RUN curl -k -s -S -o /usr/local/bin/kubectl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/$(eval ${ARCH})/kubectl && \
     chmod +x /usr/local/bin/kubectl
 RUN curl -k -s -S -o /usr/local/bin/kubectl-argo-rollouts -L https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-$(eval ${ARCH}) && \
@@ -38,6 +42,12 @@ RUN curl -k -s -S -o /usr/local/bin/argocd -L https://github.com/argoproj/argo-c
 RUN curl -k -s -S -L https://get.helm.sh/helm-v${HELM_VERSION:?}-linux-$(eval ${ARCH}).tar.gz |\
     tar xvzf - linux-$(eval ${ARCH})/helm && \
     install -m 755 linux-$(eval ${ARCH})/helm /usr/local/bin/helm
+### Terraform
+RUN curl -k -s -S -L https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_$(eval ${ARCH}).zip |\
+    bsdtar -xf - terraform \
+    && install -m 755 terraform /usr/local/bin/terraform
+RUN curl -k -s -S -o terragrunt -L https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_$(eval ${ARCH}) \
+    && install -m 755 terragrunt /usr/local/bin/terragrunt
 
 USER runner
 WORKDIR ${HOME}
