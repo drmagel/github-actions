@@ -25,9 +25,9 @@ gha-runner-scale-set:
           readinessProbe:
             tcpSocket:
               port: 2375
-            initialDelaySeconds: 10
+            initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 5
+            failureThreshold: 3
           livenessProbe:
             tcpSocket:
               port: 2375
