@@ -1,0 +1,7 @@
+gha-runner-scale-set:
+  template:
+    spec:
+      containers:
+        - name: runner
+          image: local-registry:3000/arc-runner:built
+          command: ["/home/runner/run.sh"]

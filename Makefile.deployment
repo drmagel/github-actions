@@ -37,7 +37,7 @@ vault-init:
 	@curl -X POST \
 		-H "X-Vault-Token: $(VAULT_TOKEN)" \
 		-H "Content-Type: application/json" \
-		-d '{"bound_service_account_names": ["default"],"bound_service_account_namespaces": ["*"],"policies": ["vault-secrets-operator"],"ttl": "1h"}' \
+		-d '{"bound_service_account_names": ["default"],"bound_service_account_namespaces": ["vault","actions-runner-system","dev"],"policies": ["vault-secrets-operator"],"ttl": "1h"}' \
 		$(VAULT_ADDR)/v1/auth/kubernetes/role/vso
 	
 	@curl -X POST \
@@ -69,35 +69,15 @@ cert-manager:
 		--set crds.enabled=true \
 		--namespace cert-manager --create-namespace --wait
 
-arc-controller: CHART=github-arc-controller
-arc-controller:
-# gh api /orgs/actions/packages/container/actions-runner-controller-charts%2Fgha-runner-scale-set-controller/versions \
-  --jq '.[].metadata.container.tags[]'
-# 	helm repo add actions-runner-controller actions-github-asset.github.io
-# 	helm repo update
-	yq -i '(.dependencies[]|select(.name="gha-runner-scale-set-controller")|.version)="$(ARC_RUNNER_CONTROLLER_VERSION)"' $(CHART)/Chart.yaml
-	helm dependencies build $(CHART)
-	helm upgrade --install arc-controller $(CHART) \
-		--version $(ARC_RUNNER_CONTROLLER_VERSION) \
-  	--namespace "arc-systems" --create-namespace --wait
+actions-controller:
+	helm repo add actions-runner-controller https://actions-runner-controller.github.io/actions-runner-controller
+	yq -i '(.dependencies[]|select(.name="actions-runner-controller")|.version)="$(ACTIONS_RUNNER_CONTROLLER_VERSION)"' github-actions-controller/Chart.yaml
+	( cd github-actions-controller && rm -f Chart.lock && helm dependency build )
+	helm upgrade --install actions-controller github-actions-controller \
+  	--namespace actions-runner-system --create-namespace --wait
 
-arc-runner: CHART=github-arc-runner/chart
-arc-runner:
-# gh api '/orgs/actions/packages/container/actions-runner-controller-charts%2Fgha-runner-scale-set/versions' --jq '.[].metadata.container.tags[]'
-### Bug in the chart's values.yaml doesn't allow to provide secret name as a parameter, just token as a string.
-##+ https://github.com/actions/actions-runner-controller/blob/master/charts/gha-runner-scale-set/values.yaml#L12
-	yq -i '(.dependencies[]|select(.name="gha-runner-scale-set")|.version)="$(ARC_RUNNER_SCALE_SET_VERSION)"' $(CHART)/Chart.yaml
-	helm dependencies build $(CHART)
-	helm upgrade --install arc-runner-arm64-dind $(CHART) \
-		-f $(CHART)/values.yaml -f $(CHART)/values-dind.yaml\
-		--set gha-runner-scale-set.runnerScaleSetName=arc-runner-arm64-dind \
-		--set gha-runner-scale-set.githubConfigSecret.github_token="$(GITHUB_TOKEN)" \
-		--namespace dev --create-namespace --wait
-
-	helm upgrade --install arc-runner-arm64-tools $(CHART) \
-		-f $(CHART)/values.yaml -f $(CHART)/values-dind.yaml\
-		--set gha-runner-scale-set.runnerScaleSetName=arc-runner-arm64-tools \
-		--set gha-runner-scale-set.githubConfigSecret.github_token="$(GITHUB_TOKEN)" \
+actions-runner:
+	helm upgrade --install github-actions-runner github-actions-runner-deployment/chart \
 		--namespace dev --create-namespace --wait
 
 application:
@@ -106,16 +86,16 @@ application:
 		--set global.timeout=5 \
 		--namespace dev --create-namespace --wait
 
-install: k3d wait push vault wait vault-init cert-manager arc-controller application arc-runner
+install: k3d wait push vault wait vault-init cert-manager actions-controller application actions-runner
 
 build-runner:
-	( cd github-arc-runner/image && docker build -t local-registry:3000/arc-runner:built . )
+	( cd github-actions-runner-deployment/image && docker build -t local-registry:3000/github-actions-runner:built . )
 
 build-applicaiton:
 	( cd myapp/image && docker build -t local-registry:3000/myapp:0.0.1 . )
 
 push-runner:
-	docker push local-registry:3000/arc-runner:built
+	docker push local-registry:3000/github-actions-runner:built
 
 push-applicaiton:
 	docker push local-registry:3000/myapp:0.0.1

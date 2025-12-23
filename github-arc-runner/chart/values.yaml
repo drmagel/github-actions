@@ -1,0 +1,12 @@
+gha-runner-scale-set:
+  githubConfigUrl: "https://github.com/drmagel/github-actions"
+  githubConfigSecret:
+    github_token: REPLACE
+  runnerScaleSetName: REPLACE
+
+secret:
+  name: REPLACE
+  mount: k8s-secrets
+  path: github-actions-token
+  vaultAuthRef: 'vault/vault-auth'
+  enabled: false

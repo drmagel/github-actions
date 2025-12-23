@@ -1,0 +1,13 @@
+apiVersion: v2
+name: github-arc-runner
+description: Helm umbrella chart that deploys GitHub Actions RunnerSets
+type: application
+version: 0.1.0
+appVersion: 1.0.0
+maintainers:
+  - name: Dr Magel
+dependencies:
+  - name: gha-runner-scale-set
+    version: "0.13.0"
+    # Note: For OCI repositories, the 'oci://' prefix is required
+    repository: "oci://ghcr.io/actions/actions-runner-controller-charts"
