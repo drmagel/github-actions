@@ -1,6 +1,7 @@
 gha-runner-scale-set:
   template:
     spec:
+      serviceAccountName: arc-runner
       containers:
         - name: runner
           image: local-registry:3000/arc-runner:built

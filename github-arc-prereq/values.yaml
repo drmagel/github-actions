@@ -1,0 +1,7 @@
+
+secret:
+  name: REPLACE
+  mount: k8s-secrets
+  path: github-actions-token
+  vaultAuthRef: 'vault/vault-auth'
+  enabled: true

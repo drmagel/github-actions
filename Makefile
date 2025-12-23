@@ -69,20 +69,31 @@ cert-manager:
 		--set crds.enabled=true \
 		--namespace cert-manager --create-namespace --wait
 
-arc-controller: CHART=github-arc-controller
-arc-controller:
+# arc-controller: CHART=github-arc-controller
+# arc-controller:
 # gh api /orgs/actions/packages/container/actions-runner-controller-charts%2Fgha-runner-scale-set-controller/versions \
   --jq '.[].metadata.container.tags[]'
 # 	helm repo add actions-runner-controller actions-github-asset.github.io
 # 	helm repo update
-	yq -i '(.dependencies[]|select(.name="gha-runner-scale-set-controller")|.version)="$(ARC_RUNNER_CONTROLLER_VERSION)"' $(CHART)/Chart.yaml
-	helm dependencies build $(CHART)
-	helm upgrade --install arc-controller $(CHART) \
-		--version $(ARC_RUNNER_CONTROLLER_VERSION) \
-  	--namespace "arc-systems" --create-namespace --wait
+# 	yq -i '(.dependencies[]|select(.name="gha-runner-scale-set-controller")|.version)="$(ARC_RUNNER_CONTROLLER_VERSION)"' $(CHART)/Chart.yaml
+# 	helm dependencies build $(CHART)
+# 	helm upgrade --install arc-controller $(CHART) \
+# 		--version $(ARC_RUNNER_CONTROLLER_VERSION) \
+#   	--namespace "arc-systems" --create-namespace --wait
 
-arc-runner: CHART=github-arc-runner/chart
-arc-runner:
+arc-controller: CHART=oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+arc-controller:
+	helm upgrade -i arc-controller $(CHART) \
+		--version $(ARC_RUNNER_CONTROLLER_VERSION) \
+		--namespace "arc-systems" --create-namespace --wait
+
+ac-runner-pre:
+	helm upgrade -i ac-runner-prereq github-arc-prereq \
+		--set secret.name=github-arc-runner-dev \
+		--namespace "dev" --create-namespace --wait
+
+arc-runner-chart: CHART=github-arc-runner/chart
+arc-runner-chart:
 # gh api '/orgs/actions/packages/container/actions-runner-controller-charts%2Fgha-runner-scale-set/versions' --jq '.[].metadata.container.tags[]'
 ### Bug in the chart's values.yaml doesn't allow to provide secret name as a parameter, just token as a string.
 ##+ https://github.com/actions/actions-runner-controller/blob/master/charts/gha-runner-scale-set/values.yaml#L12
@@ -99,6 +110,8 @@ arc-runner:
 		--set gha-runner-scale-set.runnerScaleSetName=arc-runner-arm64-tools \
 		--set gha-runner-scale-set.githubConfigSecret.github_token="$(GITHUB_TOKEN)" \
 		--namespace dev --create-namespace --wait
+
+arc-runner: ac-runner-pre arc-runner-chart
 
 application:
 	helm upgrade -i testapp myapp/chart \

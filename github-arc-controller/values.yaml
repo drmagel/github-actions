@@ -1,5 +1,5 @@
 secret:
-  enabled: True
+  enabled: false
   name: controller-manager
   mount: k8s-secrets
   path: github-actions-token
