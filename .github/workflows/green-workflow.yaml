@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "Running on self-hosted runner 'arc-runner-arm64-dind'"
           docker images
-          docker run --rm \
+          docker run --rm -i \
             --env-file ${{ github.workspace }}/docker.env \
             -v ${{ github.workspace }}:/work \
             ubuntu:24.04 \
