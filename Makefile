@@ -1,7 +1,7 @@
 include values.mk
 
 all:
-	@echo "Run make [install|uninstall|k3d|vault|cert-manager|actions-controller|actions-runner]"
+	@echo "Run make [install|uninstall|k3d|vault|cert-manager|arc-controller|arc-runner|application|build|push|build-runner]"
 
 uninstall:
 	k3d cluster delete --config k3d-config.yaml

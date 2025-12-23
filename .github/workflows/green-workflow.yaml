@@ -6,7 +6,7 @@ on:
       - dimar-green-work
 
 jobs:
-  build:
+  run-on-dnd:
     runs-on: arc-runner-arm64-dind
 
     steps:
@@ -15,3 +15,13 @@ jobs:
 
       - name: Run script
         run: echo "Running on self-hosted runner 'arc-runner-arm64-dind'" && sleep 900
+
+  run-on-tools:
+    runs-on: arc-runner-arm64-tools
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: echo "Running on self-hosted runner 'arc-runner-arm64-tools'" && sleep 900

@@ -5,3 +5,9 @@ gha-runner-scale-set:
         - name: runner
           image: local-registry:3000/arc-runner:built
           command: ["/home/runner/run.sh"]
+          volumeMounts:
+            - name: work
+              mountPath: /home/runner/_work
+      volumes:
+        - name: work
+          emptyDir: {}

@@ -7,16 +7,15 @@ gha-runner-scale-set:
           command: ["/home/runner/run.sh"]
           env:
             - name: DOCKER_HOST
-              value: unix:///var/run/docker.sock
+              value: tcp://localhost:2375
           volumeMounts:
             - name: work
               mountPath: /home/runner/_work
-            - name: docker-sock
-              mountPath: /var/run
         - name: docker
-          image: docker:24-dind
+          image: docker:29-rc-dind
           securityContext:
             privileged: true
+          args: ["--host=tcp://0.0.0.0:2375"]
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
@@ -25,12 +24,9 @@ gha-runner-scale-set:
               mountPath: /var/lib/docker
             - name: work
               mountPath: /home/runner/_work
-            - name: docker-sock
-              mountPath: /var/run
       volumes:
-        - name: work
-          emptyDir: {}
         - name: docker-graph-storage
           emptyDir: {}
-        - name: docker-sock
+        - name: work
           emptyDir: {}
+
