@@ -106,7 +106,7 @@ arc-runner-chart:
 		--namespace dev --create-namespace --wait
 
 	helm upgrade --install arc-runner-arm64-tools $(CHART) \
-		-f $(CHART)/values.yaml -f $(CHART)/values-dind.yaml\
+		-f $(CHART)/values.yaml -f $(CHART)/values-tools.yaml\
 		--set gha-runner-scale-set.runnerScaleSetName=arc-runner-arm64-tools \
 		--set gha-runner-scale-set.githubConfigSecret.github_token="$(GITHUB_TOKEN)" \
 		--namespace dev --create-namespace --wait

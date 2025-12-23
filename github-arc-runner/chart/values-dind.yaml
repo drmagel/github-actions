@@ -28,6 +28,11 @@ gha-runner-scale-set:
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 5
+          livenessProbe:
+            tcpSocket:
+              port: 2375
+            initialDelaySeconds: 30
+            periodSeconds: 10
           volumeMounts:
             - name: docker-graph-storage
               mountPath: /var/lib/docker
