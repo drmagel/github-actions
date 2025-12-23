@@ -20,6 +20,12 @@ gha-runner-scale-set:
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
+          readinessProbe:
+            tcpSocket:
+              port: 2375
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 5
           volumeMounts:
             - name: docker-graph-storage
               mountPath: /var/lib/docker
