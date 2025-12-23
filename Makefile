@@ -1,7 +1,7 @@
 include values.mk
 
 all:
-	@echo "Run make [install|uninstall|k3d|vault|cert-manager|arc-controller|arc-runner|application|build|push|build-runner]"
+	@echo "Run make [install|uninstall|k3d|vault|cert-manager|arc-controller|arc-runner|application|build|push|build-runner|run]"
 
 uninstall:
 	k3d cluster delete --config k3d-config.yaml
@@ -124,5 +124,5 @@ build: build-runner build-applicaiton
 
 push: push-runner push-applicaiton
 
-test:
-	(cd hashicorp-vault && ls)
+run:
+	docker run --rm -it local-registry:3000/arc-runner:built bash

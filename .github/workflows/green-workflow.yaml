@@ -5,6 +5,10 @@ on:
     branches:
       - dimar-green-work
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-on-dnd:
     runs-on: arc-runner-arm64-dind
