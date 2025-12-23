@@ -20,7 +20,6 @@ jobs:
       - name: Run script on docker container
         run: |
           echo "Running on self-hosted runner 'arc-runner-arm64-dind'"
-          sleep 30
           docker images
           docker run --rm \
             --env-file ${{ github.workspace }}/docker.env \
