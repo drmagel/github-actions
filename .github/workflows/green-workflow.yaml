@@ -17,6 +17,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Wait till docker is up and running
+        run: sleep 10
+
       - name: Run script on docker container
         run: |
           echo "Running on self-hosted runner 'arc-runner-arm64-dind'"

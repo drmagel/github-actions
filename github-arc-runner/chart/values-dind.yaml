@@ -12,17 +12,6 @@ gha-runner-scale-set:
           volumeMounts:
             - name: work
               mountPath: /home/runner/_work
-          readinessProbe:
-            tcpSocket:
-              port: 2375
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            failureThreshold: 3
-          livenessProbe:
-            tcpSocket:
-              port: 2375
-            initialDelaySeconds: 30
-            periodSeconds: 10
         - name: docker
           image: docker:29-rc-dind
           securityContext:
@@ -31,8 +20,6 @@ gha-runner-scale-set:
           env:
             - name: DOCKER_TLS_CERTDIR
               value: ""
-          ports:
-            - containerPort: 2375
           volumeMounts:
             - name: docker-graph-storage
               mountPath: /var/lib/docker
