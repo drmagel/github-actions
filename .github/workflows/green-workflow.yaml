@@ -28,7 +28,7 @@ jobs:
             --env-file ${{ github.workspace }}/docker.env \
             -v ${{ github.workspace }}:/work \
             ubuntu:24.04 \
-            ls -R \$WORKDIR
+            /work/docker-test.bash
           sleep 900
 
   run-on-tools:
