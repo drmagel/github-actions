@@ -1,3 +1,5 @@
 #!/bin/bash
 echo "WORKDIR=$WORKDIR"
-ls -L $WORKDIR
+echo "+++++++++++++++++"
+echo "ls -R $WORKDIR"
+ls -R $WORKDIR
