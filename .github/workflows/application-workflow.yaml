@@ -1,0 +1,49 @@
+name: Application Workflow
+
+on:
+  push:
+    branches:
+      - main
+      - dimar-green-work
+    paths:
+      - 'myapp/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-on-dnd:
+    runs-on: arc-runner-arm64-dind
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait till docker is up and running
+        run: sleep 10
+
+      - name: Run script on docker container
+        run: |
+          echo "Running on self-hosted runner 'arc-runner-arm64-dind'"
+          docker images
+          docker run --rm -i \
+            --env-file ${{ github.workspace }}/docker.env \
+            -v ${{ github.workspace }}:/work \
+            ubuntu:24.04 \
+            /work/docker-test.bash
+          sleep 900
+
+  run-on-tools:
+    runs-on: arc-runner-arm64-tools
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: |
+          echo "Running on self-hosted runner 'arc-runner-arm64-tools'"
+          (cd ${{ github.workspace }}; pwd)
+          ls -R ${{ github.workspace }}
+          sleep 900
