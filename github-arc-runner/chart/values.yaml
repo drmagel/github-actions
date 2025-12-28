@@ -3,10 +3,3 @@ gha-runner-scale-set:
   githubConfigSecret:
     github_token: REPLACE
   runnerScaleSetName: REPLACE
-
-secret:
-  name: REPLACE
-  mount: k8s-secrets
-  path: github-actions-token
-  vaultAuthRef: 'vault/vault-auth'
-  enabled: false
