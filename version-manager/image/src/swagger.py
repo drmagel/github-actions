@@ -34,7 +34,7 @@ API server for managing application versions in PostgreSQL or SQLite database.
 ## Authentication
 
 Use `/auth/login` endpoint to authenticate. Default credentials:
-- Username: `admin`
+- Username: Set via `ADMIN_USERNAME` environment variable (default: `admin`)
 - Password: Set via `ADMIN_PASSWORD` environment variable (default: `12VersionManager-=`)
 
 ## API Version
@@ -58,7 +58,6 @@ Endpoints for managing container images and their versions.
 - List all images and their versions
 - Create new image entries
 - Update image properties (domain, tested status)
-- Promote images across environments
 - Delete images
 
 **Version Format:** `YYYY-MM-DD-hh-mm-ss` (e.g., `2025-01-15-14-30-00`)
@@ -104,7 +103,7 @@ Authentication endpoints for user login and session management.
                 "description": "Local development server",
             },
             {
-                "url": "https://api.example.com",
+                "url": "https://version-manager.qqq.pm",
                 "description": "Production server",
             },
         ],

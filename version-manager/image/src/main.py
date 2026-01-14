@@ -17,6 +17,7 @@ from routes import router as api_router
 from swagger import get_swagger_config
 
 # Configuration
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "12VersionManager-=")
 
 
@@ -55,7 +56,7 @@ async def health_check():
 @app.post("/auth/login")
 async def login(request: LoginRequest):
     """Authenticate user with username and password."""
-    if request.username == "admin" and request.password == ADMIN_PASSWORD:
+    if request.username == ADMIN_USERNAME and request.password == ADMIN_PASSWORD:
         return {"success": True, "username": request.username}
     raise HTTPException(status_code=401, detail="Invalid username or password")
 

@@ -1,0 +1,46 @@
+global:
+  replicas: 1
+  image: local-registry:3000/version-manager
+  tag: REPLACE
+  port: 8080
+  maxSurge: 1
+  maxUnavailable: 0
+  # 'gp3' for AWS, 'standard' for local k3s, 'longhorn' for edge
+  # storageClassName: "standard"
+  storageClassName: "local-path"
+  storageSize: 100M
+  auth:
+    username: REPLACE
+    password: REPLACE
+
+postgresql:
+  enabled: false
+  global:
+    security:
+      allowInsecureImages: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/postgresql
+    tag: 17.6.0-debian-12-r4
+    pullPolicy: IfNotPresent
+  auth:
+    database: version_manager
+    username: postgres
+    password: postgres
+    postgresPassword: REPLACE
+  primary:
+    persistence:
+      enabled: true
+      size: 100M
+
+service:
+  enabled: true
+  port: 8080
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations: {}
+  tls: {}
+  host: version-manager.qqq.pm

@@ -47,7 +47,7 @@ const LoginPage = ({ onLogin }) => {
                             className="form-input"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="admin"
+                            placeholder=""
                             autoFocus
                         />
                     </div>
