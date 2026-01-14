@@ -117,13 +117,36 @@ application:
 		--set global.timeout=5 \
 		--namespace dev --create-namespace --wait
 
+version-manager-chart: CHART=version-manager/chart
+version-manager-chart:
+	yq -i '(.dependencies[]|select(.name="postgresql")|.version)="$(POSTGRESQL_VERSION)"' $(CHART)/Chart.yaml
+	helm dependencies build $(CHART)
+	helm upgrade -i version-manager $(CHART) \
+		--set global.tag=0.0.1 \
+		--set global.auth.username=$(VERSION_MANAGER_ADMIN_USERNAME) \
+		--set global.auth.password=$(VERSION_MANAGER_ADMIN_PASSWORD) \
+		--set postgresql.auth.postgresPassword=$(DB_POSTGRES_PASSWORD) \
+		--namespace version-manager --create-namespace --wait
+
+version-manager-load-data:
+	python3 vm-load-data.py
+
+version-manager:: version-manager-chart version-manager-load-data
+
 build-runner:
-	docker rmi local-registry:3000/arc-runner:built
+	docker rmi local-registry:3000/arc-runner:built || true
 	( cd github-arc-runner/image && docker build -t local-registry:3000/arc-runner:built . )
 
 build-applicaiton:
-	docker rmi local-registry:3000/myapp:0.0.1
+	docker rmi local-registry:3000/myapp:0.0.1 || true
 	( cd myapp/image && docker build -t local-registry:3000/myapp:0.0.1 . )
+
+build-version-manager:
+	docker rmi local-registry:3000/version-manager:0.0.1 || true
+	( cd version-manager/image && docker build -t local-registry:3000/version-manager:0.0.1 . )
+
+push-version-manager:
+	docker push local-registry:3000/version-manager:0.0.1
 
 push-runner:
 	docker push local-registry:3000/arc-runner:built
@@ -131,16 +154,20 @@ push-runner:
 push-application:
 	docker push local-registry:3000/myapp:0.0.1
 
-build: build-runner build-applicaiton
+build: build-runner build-version-manager build-applicaiton
 
-push: push-runner push-application
+push: push-runner push-version-manager push-application
 
 arc-runner: ac-runner-pre arc-runner-chart
 
-install: k3d wait push vault wait vault-init cert-manager arc-controller application arc-runner
+install: k3d wait push vault wait vault-init cert-manager arc-controller version-manager arc-runner application
 
 run:
 	docker run --rm -it local-registry:3000/arc-runner:built bash
 
 prune:
 	docker builder prune -f
+
+
+
+# helm repo add bitnami https://charts.bitnami.com/bitnami

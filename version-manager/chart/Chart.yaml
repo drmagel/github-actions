@@ -1,0 +1,16 @@
+apiVersion: v1
+name: version-manager
+description: Version Manager application
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+keywords:
+  - version-manager
+  - k3d
+maintainers:
+  - name: Dr Magel
+dependencies:
+  - name: postgresql
+    version: 16.4.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled

@@ -1,0 +1,89 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+{{ $enabled := .Values.postgresql.enabled }}
+{{ $pg_auth := .Values.postgresql.auth }}
+{{ $global := $.Values.global }}
+
+{{ if $enabled }}
+{{ with $global }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ $name }}
+  name: {{ $name }}
+  namespace: {{ $namespace }}
+spec:
+  minReadySeconds: 5
+  progressDeadlineSeconds: 300
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ $name }}
+  strategy:
+    rollingUpdate:
+      {{- with .maxSurge }}
+      maxSurge: {{ . }}
+      {{- end }}
+      {{- with .maxUnavailable }}
+      maxUnavailable: {{ . }}
+      {{- end }}
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: {{ $name }}
+    spec:
+      containers:
+      - name: {{ $name }}
+        image: {{ .image }}:{{ .tag }}
+        imagePullPolicy: Always
+        env: 
+        - name: ADMIN_PASSWORD
+          value: {{ .auth.password }}
+        - name: ADMIN_USERNAME
+          value: {{ .auth.username }}
+      {{- with $pg_auth }}
+        - name: DB_HOST
+          value: {{ $name }}-postgresql
+        - name: DB_PORT
+          value: {{ .port | default "5432" | quote }}
+        - name: DB_NAME
+          value: {{ .database }}
+        - name: DB_USER
+          value: {{ .username }}
+        - name: DB_PASSWORD
+          value: {{ .password }}
+      {{- end }}
+        ports:
+        - containerPort: {{ .port }}
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 20
+          httpGet:
+            scheme: HTTP
+            path: /health
+            port: {{ .port }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            scheme: HTTP
+            path: /health
+            port: {{ .port }}
+          initialDelaySeconds: 10
+          timeoutSeconds: 30
+          periodSeconds: 30
+        startupProbe:
+          httpGet:
+            path: /health
+            port: {{ .port }}
+          failureThreshold: 30
+          periodSeconds: 10
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+{{ end }}
+{{ end }}

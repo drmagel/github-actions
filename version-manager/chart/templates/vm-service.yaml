@@ -1,0 +1,23 @@
+{{ $name := .Release.Name }}
+{{ $namespace := .Release.Namespace }}
+{{ $targetPort := .Values.global.port }}
+
+{{ with .Values.service }}
+{{ if .enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels:
+    app: {{ $name }}
+spec:
+  type: {{ .type }}
+  ports:
+    - port: {{ .port }}
+      targetPort: {{ $targetPort }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ $name }}
+{{ end }}
+{{ end }}

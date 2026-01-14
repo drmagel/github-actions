@@ -109,25 +109,6 @@ async def create_image_version(
         raise HTTPException(status_code=500, detail=f"Error creating image version {image_name}: {str(e)}")
 
 
-@router.put("/images/{image_name}/promote", response_model=S.ImageResponse, tags=["Images"])
-async def promote_image(
-    image_name: str,
-    version: S.ImageVersion):
-    """
-    Promote image to staging environment.
-    Obsolete endpoint. Will be removed in the future.
-    The promotion is done via domain promotion.
-    """
-    try:
-        image = await db.promote_image(name=image_name, version=version.version)
-        if not image:
-            raise HTTPException(status_code=404, detail=f"Image '{image_name}' version '{version.version}' not found")
-        return image
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error promoting image {image_name}: {str(e)}")
-
 
 @router.put("/images/{image_name}/tested", response_model=S.ImageResponse, tags=["Images"])
 async def set_image_tested(
